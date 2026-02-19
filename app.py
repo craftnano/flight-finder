@@ -226,8 +226,17 @@ with st.sidebar:
     show_delays = st.checkbox("Show on-time prediction",
                               help="Uses additional API calls per flight")
 
-    currency = detect_currency(fly_from)
-    st.caption(f"Currency: {currency} (based on departure airport)")
+    detected_currency = detect_currency(fly_from)
+    currency_options = ["CAD", "USD", "EUR", "GBP", "AUD", "JPY", "CHF",
+                        "NZD", "SGD", "HKD", "KRW", "MXN", "BRL", "ZAR",
+                        "AED", "THB", "TWD", "CNY", "DKK", "TRY", "ILS",
+                        "COP", "CLP", "PEN", "ARS", "KES", "EGP", "ETB",
+                        "QAR", "JOD", "PHP", "MYR"]
+    default_idx = (currency_options.index(detected_currency)
+                   if detected_currency in currency_options else 0)
+    currency = st.selectbox("Currency", currency_options, index=default_idx,
+                            help=f"Auto-detected: {detected_currency} "
+                                 f"(based on {fly_from})")
 
     remaining = MAX_SEARCHES_PER_DAY - st.session_state.search_count
     st.caption(f"Searches remaining today: {remaining}")
