@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 220" width="480" height="220">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F4FD;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#D4ECFB;stop-opacity:0.2" />
+    </linearGradient>
+    <linearGradient id="planeBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF7170;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF9472;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="wingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF8A80;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF6E6E;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2D3561;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3D4580;stop-opacity:1" />
+    </linearGradient>
+    <filter id="softShadow">
+      <feDropShadow dx="1.5" dy="2.5" stdDeviation="3" flood-color="#00000018"/>
+    </filter>
+    <filter id="textShadow">
+      <feDropShadow dx="0.5" dy="1" stdDeviation="0.5" flood-color="#00000015"/>
+    </filter>
+  </defs>
+
+  <!-- Soft cloud puffs in background -->
+  <circle cx="60" cy="70" r="20" fill="#E8F4FD" opacity="0.5"/>
+  <circle cx="82" cy="62" r="25" fill="#E8F4FD" opacity="0.4"/>
+  <circle cx="45" cy="65" r="16" fill="#E8F4FD" opacity="0.3"/>
+  <circle cx="415" cy="50" r="18" fill="#E8F4FD" opacity="0.5"/>
+  <circle cx="438" cy="42" r="22" fill="#E8F4FD" opacity="0.35"/>
+  <circle cx="240" cy="30" r="14" fill="#E8F4FD" opacity="0.3"/>
+  <circle cx="260" cy="25" r="10" fill="#E8F4FD" opacity="0.25"/>
+
+  <!-- === CARTOON AIRPLANE === -->
+  <g filter="url(#softShadow)" transform="translate(155, 28) scale(0.95)">
+    
+    <!-- Tail fin - vertical -->
+    <path d="M 12,32 C 2,18 -5,8 8,12 L 20,22 Z" fill="#FF8A80" stroke="#E06060" stroke-width="1.5" stroke-linejoin="round"/>
+    
+    <!-- Tail fin - horizontal top -->
+    <path d="M 5,28 C -12,18 -8,12 5,20 Q 15,24 18,30 Z" fill="#FF9C8E" stroke="#E06060" stroke-width="1.2"/>
+    
+    <!-- Main fuselage - squishy rounded blob -->
+    <ellipse cx="80" cy="42" rx="72" ry="26" fill="url(#planeBody)" stroke="#E06060" stroke-width="2"/>
+    
+    <!-- Belly highlight -->
+    <ellipse cx="80" cy="52" rx="55" ry="10" fill="#FFB5A7" opacity="0.35"/>
+    
+    <!-- Top wing -->
+    <path d="M 50,22 C 40,2 75,-2 95,10 Q 105,16 98,24 L 60,24 Z" fill="url(#wingGrad)" stroke="#E06060" stroke-width="1.5" stroke-linejoin="round"/>
+    
+    <!-- Bottom wing -->
+    <path d="M 55,60 C 45,78 78,82 96,72 Q 104,66 98,58 L 62,58 Z" fill="url(#wingGrad)" stroke="#E06060" stroke-width="1.5" stroke-linejoin="round"/>
+    
+    <!-- Cockpit windshield -->
+    <path d="M 135,32 C 148,28 155,34 152,42 C 150,48 140,50 135,46 Z" fill="#87CEEB" stroke="#E06060" stroke-width="1.5"/>
+    <!-- Windshield shine -->
+    <path d="M 138,34 C 144,31 148,34 146,38 C 144,40 140,40 138,38 Z" fill="white" opacity="0.45"/>
+    
+    <!-- Windows on fuselage -->
+    <circle cx="55" cy="39" r="5.5" fill="#87CEEB" stroke="#E06060" stroke-width="1.2"/>
+    <circle cx="72" cy="39" r="5.5" fill="#87CEEB" stroke="#E06060" stroke-width="1.2"/>
+    <circle cx="89" cy="39" r="5.5" fill="#87CEEB" stroke="#E06060" stroke-width="1.2"/>
+    <circle cx="106" cy="39" r="5.5" fill="#87CEEB" stroke="#E06060" stroke-width="1.2"/>
+    
+    <!-- Window shines -->
+    <circle cx="54" cy="37.5" r="2" fill="white" opacity="0.35"/>
+    <circle cx="71" cy="37.5" r="2" fill="white" opacity="0.35"/>
+    <circle cx="88" cy="37.5" r="2" fill="white" opacity="0.35"/>
+    <circle cx="105" cy="37.5" r="2" fill="white" opacity="0.35"/>
+    
+    <!-- Nose cone -->
+    <ellipse cx="152" cy="42" rx="8" ry="14" fill="#FF8570" stroke="#E06060" stroke-width="1.5"/>
+    
+    <!-- Propeller hub -->
+    <circle cx="160" cy="42" r="5.5" fill="#FFD93D" stroke="#D4A800" stroke-width="1.5"/>
+    
+    <!-- Propeller blades - slight angle for motion -->
+    <ellipse cx="160" cy="26" rx="3.5" ry="14" fill="#FFD93D" opacity="0.75" transform="rotate(12, 160, 42)"/>
+    <ellipse cx="160" cy="58" rx="3.5" ry="14" fill="#FFD93D" opacity="0.75" transform="rotate(12, 160, 42)"/>
+    
+    <!-- Cheek blush on nose - kawaii touch -->
+    <circle cx="142" cy="48" r="5" fill="#FF9999" opacity="0.3"/>
+    <circle cx="142" cy="36" r="4" fill="#FF9999" opacity="0.2"/>
+  </g>
+  
+  <!-- Motion lines behind plane -->
+  <g stroke-linecap="round">
+    <line x1="110" y1="62" x2="145" y2="62" stroke="#FFB5A7" stroke-width="2.5" opacity="0.5"/>
+    <line x1="100" y1="72" x2="140" y2="72" stroke="#FFB5A7" stroke-width="2" opacity="0.35"/>
+    <line x1="115" y1="82" x2="148" y2="82" stroke="#FFB5A7" stroke-width="1.5" opacity="0.25"/>
+  </g>
+  
+  <!-- Sparkle/star accents -->
+  <g fill="#FFD93D">
+    <path d="M 370,35 L 372,28 L 374,35 L 381,37 L 374,39 L 372,46 L 370,39 L 363,37 Z" opacity="0.6"/>
+    <path d="M 120,38 L 121,34 L 122,38 L 126,39 L 122,40 L 121,44 L 120,40 L 116,39 Z" opacity="0.5" transform="scale(0.7) translate(150, 50)"/>
+    <path d="M 400,75 L 401.5,71 L 403,75 L 407,76.5 L 403,78 L 401.5,82 L 400,78 L 396,76.5 Z" opacity="0.45"/>
+  </g>
+
+  <!-- === MAKE ME FLY text === -->
+  <g filter="url(#textShadow)">
+    <!-- "MAKE ME" in lighter weight -->
+    <text x="240" y="148" text-anchor="middle" font-family="'Nunito', 'Quicksand', 'Poppins', 'Comfortaa', sans-serif" font-size="28" font-weight="600" fill="#6B7B99" letter-spacing="5">MAKE ME</text>
+    
+    <!-- "FLY" in big bold bubbly letters -->
+    <text x="240" y="195" text-anchor="middle" font-family="'Nunito', 'Quicksand', 'Poppins', 'Comfortaa', sans-serif" font-size="58" font-weight="900" fill="url(#textGrad)" letter-spacing="8">FLY</text>
+  </g>
+  
+  <!-- Small tagline -->
+  <text x="240" y="214" text-anchor="middle" font-family="'Nunito', 'Quicksand', 'Poppins', sans-serif" font-size="11" font-weight="500" fill="#9EAAB8" letter-spacing="2.5">DISCOVER YOUR NEXT ADVENTURE</text>
+</svg>

@@ -1,0 +1,4 @@
+amadeus>=9.0
+python-dotenv>=1.0
+streamlit>=1.38
+pandas>=2.0

@@ -1,0 +1,4 @@
+.env
+price_history.db
+__pycache__/
+api_usage.json
