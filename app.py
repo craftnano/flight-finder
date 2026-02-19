@@ -392,6 +392,10 @@ if search and not date_error:
                     for dest, info in sorted_dests:
                         flight = info["flight"]
                         segments = flight["itineraries"][0]["segments"]
+                        flight_nums = ", ".join(
+                            f"{s['carrierCode']} {s['number']}"
+                            for s in segments
+                        )
                         airlines = ", ".join(sorted(set(
                             airline_names.get(
                                 s["carrierCode"], s["carrierCode"]
@@ -428,6 +432,7 @@ if search and not date_error:
                             "Return": ret_dt.strftime("%Y-%m-%d"),
                             "Price": f"${info['price']:,.0f} {currency}",
                             "Savings": savings_str,
+                            "Flight": flight_nums,
                             "Airlines": airlines,
                             "Stops": stops,
                             "Duration": duration.replace(
@@ -638,6 +643,10 @@ if search and not date_error:
                     rows = []
                     for dest, (f, price_val) in sorted_dests:
                         segments = f["itineraries"][0]["segments"]
+                        flight_nums = ", ".join(
+                            f"{s['carrierCode']} {s['number']}"
+                            for s in segments
+                        )
                         airlines = ", ".join(sorted(set(
                             airline_names.get(s["carrierCode"], s["carrierCode"])
                             for s in segments
@@ -659,6 +668,7 @@ if search and not date_error:
                             "Price": f"${price_val:,.0f} {currency}",
                             "Deal": deal_label,
                             "Departure": segments[0]["departure"]["at"][:10],
+                            "Flight": flight_nums,
                             "Airlines": airlines,
                             "Stops": stops,
                             "Duration": duration.replace("PT", "").lower(),
