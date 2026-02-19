@@ -22,6 +22,7 @@ from flight_finder import (
     CITY_NAMES,
 )
 from api_usage import get_usage
+from ip_limiter import check_ip_limit, get_ip_usage
 import pandas as pd
 
 st.set_page_config(page_title="Make Me Fly", page_icon="✈️", layout="wide")
@@ -168,7 +169,6 @@ with st.sidebar:
         dep_date = None
         ret_date = None
         # Generate next 6 months
-        from calendar import monthrange
         month_options = []
         today = date.today()
         cur_year, cur_month = today.year, today.month
@@ -253,6 +253,23 @@ else:
 
 # --- Main: Results ---
 if search and not date_error:
+    # Get client IP for rate limiting
+    _headers = st.context.headers
+    client_ip = (
+        _headers.get("X-Forwarded-For", "").split(",")[0].strip()
+        or _headers.get("X-Real-Ip", "")
+        or "unknown"
+    )
+
+    # Check IP rate limit
+    if not check_ip_limit(client_ip):
+        st.error(
+            "You've reached the daily search limit. "
+            "Make Me Fly limits searches per user to keep the service "
+            "free for everyone. Please try again tomorrow."
+        )
+        st.stop()
+
     st.session_state.search_count += 1
 
     # Check API cap before starting

@@ -16,9 +16,17 @@ from api_usage import increment_usage, get_usage
 
 load_dotenv()
 
+_client_id = os.environ.get("AMADEUS_CLIENT_ID")
+_client_secret = os.environ.get("AMADEUS_CLIENT_SECRET")
+if not _client_id or not _client_secret:
+    raise SystemExit(
+        "Missing Amadeus credentials. "
+        "Set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in your .env file."
+    )
+
 amadeus = Client(
-    client_id=os.environ["AMADEUS_CLIENT_ID"],
-    client_secret=os.environ["AMADEUS_CLIENT_SECRET"],
+    client_id=_client_id,
+    client_secret=_client_secret,
 )
 
 CABIN_CLASSES = ["ECONOMY", "BUSINESS", "FIRST"]
@@ -717,10 +725,8 @@ def predict_delay(segment):
 
 def google_flights_url(origin, dest, dep_date, cabin="ECONOMY"):
     """Build a Google Flights search URL."""
+    from urllib.parse import quote
     cabin_map = {"ECONOMY": "economy", "BUSINESS": "business", "FIRST": "first"}
     cabin_str = cabin_map.get(cabin, "economy")
-    return (
-        f"https://www.google.com/travel/flights"
-        f"?q=Flights+to+{dest}+from+{origin}+on+{dep_date}"
-        f"+{cabin_str}+class"
-    )
+    query = f"Flights to {dest} from {origin} on {dep_date} {cabin_str} class"
+    return f"https://www.google.com/travel/flights?q={quote(query)}"
