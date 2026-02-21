@@ -1,6 +1,7 @@
 # Built by a GRC professional who is hoping if she gets replaced by AI,
 # at least she can fly somewhere cheap
 # Powered by Claude Code, Amadeus, and an unreasonable amount of Diet Coke
+import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from amadeus import Client, ResponseError
@@ -28,6 +29,25 @@ amadeus = Client(
     client_id=_client_id,
     client_secret=_client_secret,
 )
+
+log = logging.getLogger("makemefly.api")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
+
+
+def _log_response(endpoint, response):
+    """Log status and body summary for a successful Amadeus response."""
+    status = getattr(response, "status_code", "?")
+    n = len(response.data) if response.data else 0
+    log.info("[%s] %s — %d result(s)", endpoint, status, n)
+
+
+def _log_error(endpoint, e):
+    """Log full status and body for a failed Amadeus response."""
+    resp = getattr(e, "response", None)
+    status = getattr(resp, "status_code", "?")
+    body = getattr(resp, "body", None) or getattr(resp, "result", "no body")
+    log.warning("[%s] %s — %s", endpoint, status, body)
+
 
 CABIN_CLASSES = ["ECONOMY", "BUSINESS", "FIRST"]
 
@@ -195,8 +215,10 @@ def get_direct_destinations(origin="YVR"):
         response = amadeus.airport.direct_destinations.get(
             departureAirportCode=origin
         )
+        _log_response("direct_destinations", response)
         return [d["iataCode"] for d in response.data]
     except ResponseError as e:
+        _log_error("direct_destinations", e)
         raise _friendly_error(e, "destination lookup")
 
 
@@ -214,8 +236,10 @@ def discover_destinations(origin="YVR", departure_date=None, max_price=None):
     _check_cap()
     try:
         response = amadeus.shopping.flight_destinations.get(**params)
+        _log_response("flight_destinations", response)
         return response.data
-    except ResponseError:
+    except ResponseError as e:
+        _log_error("flight_destinations", e)
         pass
 
     codes = get_direct_destinations(origin)
@@ -254,8 +278,10 @@ def search_flights(
 
     try:
         response = amadeus.shopping.flight_offers_search.get(**params)
+        _log_response(f"flight_offers {origin}->{destination}", response)
         return response.data
     except ResponseError as e:
+        _log_error(f"flight_offers {origin}->{destination}", e)
         raise _friendly_error(e, "flight search")
 
 
@@ -325,8 +351,10 @@ def get_price_analysis(origin, destination, departure_date):
             destinationIataCode=destination,
             departureDate=departure_date,
         )
+        _log_response(f"price_metrics {origin}->{destination}", response)
         return response.data
-    except ResponseError:
+    except ResponseError as e:
+        _log_error(f"price_metrics {origin}->{destination}", e)
         return None
 
 
@@ -602,13 +630,16 @@ def lookup_airlines_batch(codes):
             _check_cap()
             codes_str = ",".join(to_fetch)
             response = amadeus.reference_data.airlines.get(airlineCodes=codes_str)
+            _log_response("airlines", response)
             for airline in (response.data or []):
                 iata = airline.get("iataCode", "")
                 name = (airline.get("businessName")
                         or airline.get("commonName")
                         or iata)
                 _airline_cache[iata] = clean_airline_name(name)
-        except (ResponseError, FlightSearchError):
+        except ResponseError as e:
+            _log_error("airlines", e)
+        except FlightSearchError:
             pass
         # Cache misses as code→code so we don't retry
         for code in to_fetch:
@@ -694,6 +725,7 @@ def predict_delay(segment):
         arr_dt = segment["arrival"]["at"]
 
         _check_cap()
+        flight_id = f"{segment['carrierCode']}{segment['number']}"
         response = amadeus.travel.predictions.flight_delay.get(
             originLocationCode=segment["departure"]["iataCode"],
             destinationLocationCode=segment["arrival"]["iataCode"],
@@ -706,6 +738,7 @@ def predict_delay(segment):
             flightNumber=segment["number"],
             duration=segment.get("duration", "PT0H"),
         )
+        _log_response(f"delay_prediction {flight_id}", response)
 
         if not response.data:
             return None
@@ -724,6 +757,9 @@ def predict_delay(segment):
             if prob is not None:
                 return f"{float(prob) * 100:.0f}% on-time"
 
+        return None
+    except ResponseError as e:
+        _log_error("delay_prediction", e)
         return None
     except Exception:
         return None
