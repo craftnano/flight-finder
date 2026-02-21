@@ -18,6 +18,7 @@ from flight_finder import (
     google_flights_url,
     FlightSearchError,
     ApiCapExceeded,
+    QuotaExhausted,
     HUBS_BY_REGION,
     CITY_NAMES,
 )
@@ -334,6 +335,9 @@ if search and not date_error:
                         nonstop,
                         max_price,
                     )
+            except QuotaExhausted as e:
+                st.error("✈️ " + e.message)
+                st.stop()
             except ApiCapExceeded:
                 st.error(
                     "Make Me Fly has been really popular today! "
@@ -554,6 +558,9 @@ if search and not date_error:
                         tuple(cabins), tuple(dest_list), currency, nonstop,
                         max_price,
                     )
+            except QuotaExhausted as e:
+                st.error("✈️ " + e.message)
+                st.stop()
             except ApiCapExceeded:
                 st.error(
                     "Make Me Fly has been really popular today! "

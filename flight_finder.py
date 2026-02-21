@@ -137,20 +137,34 @@ class ApiCapExceeded(FlightSearchError):
         )
 
 
+class QuotaExhausted(FlightSearchError):
+    """Raised when the Amadeus free-tier monthly quota is exhausted."""
+    def __init__(self):
+        super().__init__(
+            "Make Me Fly has used up its free API calls for the month. "
+            "We run on Amadeus's free developer tier, which has monthly "
+            "limits. Please try again next month — or use Google Flights "
+            "in the meantime. Thanks for flying with us!",
+            recoverable=False,
+        )
+
+
+def _is_quota_error(e):
+    """Check if a ResponseError indicates quota/rate exhaustion."""
+    status = getattr(getattr(e, "response", None), "status_code", None)
+    if status in (429, 401):
+        return True
+    body = str(getattr(getattr(e, "response", None), "body", "") or "").lower()
+    return any(kw in body for kw in ("quota", "rate limit", "exceeded", "unauthorized"))
+
+
 def _friendly_error(e, context="search"):
     """Convert a ResponseError into a FlightSearchError with a friendly message."""
+    if _is_quota_error(e):
+        return QuotaExhausted()
+
     status = getattr(getattr(e, "response", None), "status_code", None)
 
-    if isinstance(e, AuthenticationError) or status == 401:
-        return FlightSearchError(
-            "Make Me Fly is having trouble connecting to its data source. "
-            "Please try again in a few minutes."
-        )
-    if status == 429:
-        return FlightSearchError(
-            "Searches are coming in faster than our data provider allows. "
-            "Please wait a moment and try again."
-        )
     if isinstance(e, ServerError) or (status and status >= 500):
         return FlightSearchError(
             "Our flight data provider is experiencing issues. "
@@ -159,14 +173,6 @@ def _friendly_error(e, context="search"):
     if isinstance(e, NetworkError):
         return FlightSearchError(
             "The search is taking longer than expected. Please try again."
-        )
-
-    # Check for quota/limit errors in the response body
-    body = getattr(getattr(e, "response", None), "body", "") or ""
-    if "quota" in body.lower() or "limit" in body.lower():
-        return FlightSearchError(
-            "Make Me Fly has been popular this month! "
-            "We've hit our data limit. Resets on the 1st."
         )
 
     return FlightSearchError("Something unexpected happened. Please try again.")
@@ -438,7 +444,9 @@ def search_parallel(
                 cabin, dest, flights = future.result()
                 if flights:
                     results_by_cabin[cabin].extend(flights)
-            except ApiCapExceeded:
+            except (ApiCapExceeded, QuotaExhausted):
+                for f in futures:
+                    f.cancel()
                 raise
             except FlightSearchError:
                 continue
@@ -530,7 +538,9 @@ def search_flexible(
                         best[key]["price"] = price
                         best[key]["date"] = dep_date
                         best[key]["flight"] = cheapest_flight
-            except ApiCapExceeded:
+            except (ApiCapExceeded, QuotaExhausted):
+                for f in futures:
+                    f.cancel()
                 raise
             except FlightSearchError:
                 continue
